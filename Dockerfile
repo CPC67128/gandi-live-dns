@@ -1,4 +1,4 @@
-FROM python:3.7-buster
+FROM python:3.13-alpine
 
 LABEL maintainer=david@dme.ninja
 LABEL version="0.1"
