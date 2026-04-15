@@ -1,0 +1,5 @@
+services:
+  gandi-live-dns:
+    image: 192.168.1.192:5000/gandi-live-dns:latest
+    command: ["python", "/gandi-live-dns/gandi-live-dns.py", "-v", "-r", "300"]
+    restart: unless-stopped

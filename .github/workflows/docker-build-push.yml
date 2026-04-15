@@ -1,0 +1,43 @@
+name: Build and push Docker image (internal registry)
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build-and-push:
+    # IMPORTANT: needs LAN access to 192.168.1.192 -> use self-hosted runner
+    runs-on: [self-hosted, linux]
+
+    permissions:
+      contents: read
+
+    env:
+      REGISTRY: 192.168.1.192:5000
+      IMAGE_NAME: gandi-live-dns
+      # Tag strategy: "latest" + short SHA for traceability
+      TAG_LATEST: latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compute image tags
+        id: meta
+        run: |
+          echo "TAG_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+          echo "IMAGE=${REGISTRY}/${IMAGE_NAME}" >> $GITHUB_ENV
+
+      - name: Write webscraping config
+        run: echo "${{ secrets.CONFIG }}" > ./config.py
+
+      - name: Build image (two tags)
+        run: |
+          docker build --no-cache \
+            -t ${IMAGE}:latest \
+            .
+
+      - name: Push tags
+        run: |
+          docker push ${IMAGE}:latest
+
